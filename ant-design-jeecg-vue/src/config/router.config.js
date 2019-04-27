@@ -336,7 +336,7 @@ export const asyncRouterMap = [
             name: 'settings',
             component: () => import('@/views/account/settings/Index'),
             meta: { title: '个人设置', hideHeader: true, keepAlive: true, permission: [ 'user' ]  },
-            redirect: '/account/settings/base',
+            redirect: '/account/settings/BaseSetting',
             alwaysShow: true,
             children: [
               {
@@ -396,16 +396,16 @@ export const constantRouterMap = [
         name: 'login',
         component: () => import(/* webpackChunkName: "user" */ '@/views/user/Login')
       },
-      {
-        path: 'register',
-        name: 'register',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/Register')
-      },
-      {
-        path: 'register-result',
-        name: 'registerResult',
-        component: () => import(/* webpackChunkName: "user" */ '@/views/user/RegisterResult')
-      },
+      // {
+      //   path: 'register',
+      //   name: 'register',
+      //   component: () => import(/* webpackChunkName: "user" */ '@/views/user/Register')
+      // },
+      // {
+      //   path: 'register-result',
+      //   name: 'registerResult',
+      //   component: () => import(/* webpackChunkName: "user" */ '@/views/user/RegisterResult')
+      // },
     ]
   },
 

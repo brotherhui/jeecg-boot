@@ -1,0 +1,2 @@
+1. docker pull redis
+2. docker run -p 127.0.0.1:6379:6379/tcp --name some-redis -d redis

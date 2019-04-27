@@ -9,7 +9,7 @@
 
           <a-form-item
             fieldDecoratorId="username"
-            :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入帐户名或邮箱' }, { validator: this.handleUsernameOrEmail }], validateTrigger: 'change'}">
+            :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入帐户名' }, { validator: this.handleUsernameOrEmail }], validateTrigger: 'change'}">
             <a-input size="large" type="text" placeholder="请输入帐户名 / jeecg">
               <a-icon slot="prefix" type="user" :style="{ color: 'rgba(0,0,0,.25)' }"/>
             </a-input>
@@ -23,42 +23,10 @@
             </a-input>
           </a-form-item>
         </a-tab-pane>
-        <a-tab-pane key="tab2" tab="手机号登陆">
-          <a-form-item
-            fieldDecoratorId="mobile"
-            :fieldDecoratorOptions="{rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: '请输入正确的手机号' }], validateTrigger: 'change'}">
-            <a-input size="large" type="text" placeholder="手机号">
-              <a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-            </a-input>
-          </a-form-item>
-
-          <a-row :gutter="16">
-            <a-col class="gutter-row" :span="16">
-              <a-form-item
-                fieldDecoratorId="captcha"
-                :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入验证码' }], validateTrigger: 'blur'}">
-                <a-input size="large" type="text" placeholder="验证码">
-                  <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-                </a-input>
-              </a-form-item>
-            </a-col>
-            <a-col class="gutter-row" :span="8">
-              <a-button
-                class="getCaptcha"
-                tabindex="-1"
-                :disabled="state.smsSendBtn"
-                @click.stop.prevent="getCaptcha"
-                v-text="!state.smsSendBtn && '获取验证码' || (state.time+' s')"></a-button>
-            </a-col>
-          </a-row>
-        </a-tab-pane>
       </a-tabs>
 
       <a-form-item>
         <a-checkbox v-model="formLogin.rememberMe">自动登陆</a-checkbox>
-        <router-link :to="{ name: 'recover', params: { user: 'aaa'} }" class="forge-password" style="float: right;">
-          忘记密码
-        </router-link>
       </a-form-item>
 
       <a-form-item style="margin-top:24px">
@@ -72,16 +40,6 @@
           :disabled="loginBtn">确定
         </a-button>
       </a-form-item>
-
-     <!-- <div class="user-login-other">
-        <span>其他登陆方式</span>
-        <a><a-icon class="item-icon" type="alipay-circle"></a-icon></a>
-        <a><a-icon class="item-icon" type="taobao-circle"></a-icon></a>
-        <a><a-icon class="item-icon" type="weibo-circle"></a-icon></a>
-        <router-link class="register" :to="{ name: 'register' }">
-          注册账户
-        </router-link>
-      </div>-->
     </a-form>
 
     <two-step-captcha
@@ -164,8 +122,6 @@
           remember_me: that.formLogin.rememberMe
         };
 
-        // 使用账户密码登陆
-        if (that.customActiveKey === 'tab1') {
           that.form.validateFields([ 'username', 'password' ], { force: true }, (err, values) => {
             if (!err) {
               flag = true
@@ -174,15 +130,7 @@
               loginParams.password = values.password
             }
           })
-        // 使用手机号登陆
-        } else {
-          that.form.validateFields([ 'mobile', 'captcha' ], { force: true }, (err, values) => {
-            if (!err) {
-              flag = true
-              loginParams = Object.assign(loginParams, values)
-            }
-          })
-        }
+
 
         if (!flag) return
 
@@ -198,53 +146,6 @@
           that.requestFailed(err);
         })
 
-      },
-      getCaptcha (e) {
-        e.preventDefault()
-        let that = this
-
-        this.form.validateFields([ 'mobile' ], { force: true },
-          (err) => {
-            if (!err) {
-              this.state.smsSendBtn = true;
-
-              let interval = window.setInterval(() => {
-                if (that.state.time-- <= 0) {
-                  that.state.time = 60;
-                  that.state.smsSendBtn = false;
-                  window.clearInterval(interval);
-                }
-              }, 1000);
-
-              const hide = this.$message.loading('验证码发送中..', 0);
-              this.$http.post(api.SendSms, { mobile: that.formLogin.mobile })
-                .then(res => {
-                  setTimeout(hide, 2500);
-                  this.$notification[ 'success' ]({
-                    message: '提示',
-                    description: '验证码获取成功，您的验证码为：' + res.result.captcha,
-                    duration: 8
-                  })
-                })
-                .catch(err => {
-                  setTimeout(hide, 1);
-                  clearInterval(interval);
-                  that.state.time = 60;
-                  that.state.smsSendBtn = false;
-                  this.requestFailed(err);
-                });
-            }
-          }
-        );
-      },
-      stepCaptchaSuccess () {
-        this.loginSuccess()
-      },
-      stepCaptchaCancel () {
-        this.Logout().then(() => {
-          this.loginBtn = false
-          this.stepCaptchaVisible = false
-        })
       },
       loginSuccess () {
         this.loginBtn = false
@@ -271,12 +172,6 @@
   .user-layout-login {
     label {
       font-size: 14px;
-    }
-
-    .getCaptcha {
-      display: block;
-      width: 100%;
-      height: 40px;
     }
 
     .forge-password {
